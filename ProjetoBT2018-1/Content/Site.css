@@ -51,3 +51,26 @@ textarea {
     display: block;
     margin: 10px 0 10px 0;
 }
+
+#boxStatus, #boxLabelsDetalhe, #boxDetalheStatus {
+    background-color: red;
+    margin-top: 1%;
+    padding: 0px;
+}
+
+#boxS_1, #boxS_2, #boxS_3 {
+    float:left;
+    background-color:yellow;
+    padding:0px;
+    
+}
+
+#boxS_2, #boxS_3 {
+    clear:left;
+}
+
+#boxLabelsDetalhe {
+    background-color: aquamarine;
+    margin-left: 15px;
+}
+

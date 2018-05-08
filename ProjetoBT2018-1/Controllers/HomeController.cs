@@ -1,14 +1,15 @@
-﻿using System.Web.Mvc;
+﻿using ProjetoBT2018_1.Models;
 using ProjetoBT2018_1.Models.Dominio;
-using ProjetoBT2018_1.Models;
-using System.Threading;
-using System.Web;
+using ProjetoBT2018_1.Models.Repositorios;
 using System;
+using System.Web;
+using System.Web.Mvc;
 
 namespace ProjetoBT2018_1.Controllers
 {
     public class HomeController : Controller
     {
+        private BcUsuario bcUsuario = BcUsuarioADO.BcUsuarioConstrutor(); 
         HttpCookie cookie;
 
         // Aqui eu criei uma action que redireciona o usuario para tela de login.
@@ -29,13 +30,20 @@ namespace ProjetoBT2018_1.Controllers
         [HttpPost]
         public ActionResult Login(Usuario usuario)
         {
-            if (new BcSistema().ValidaUser(usuario.Email, usuario.Senha))
-            {
-                cookie = new HttpCookie("Login", "User");
-                cookie.Expires = DateTime.Now.AddHours(0.30);
-                Response.SetCookie(cookie);
+            Usuario usuarioTemp = bcUsuario.SelectId(usuario.Email);
 
-                return RedirectToAction("Index", "Usuario");
+            if (usuarioTemp.Id != 0)
+            {
+                if (usuario.Senha == usuarioTemp.Senha)
+                {
+                    usuario = usuarioTemp;
+                    cookie = new HttpCookie("Login");
+                    cookie.Expires = DateTime.Now.AddHours(0.30);
+                    cookie.Values.Set("User", usuario.Email);
+                    Response.SetCookie(cookie);
+
+                    return RedirectToAction("Index", "Usuario");
+                }
             }
 
             ModelState.AddModelError("", "E-mail e/ou senha invalida!");
@@ -57,26 +65,25 @@ namespace ProjetoBT2018_1.Controllers
         [HttpPost]
         public ActionResult Cadastrar(Usuario usuario)
         {
-            BcSistema bcSistema = new BcSistema();
-
             if (ModelState.IsValid)
             {
-                if (usuario.Senha == usuario.ConfSenha)
+                if (bcUsuario.SelectId(usuario.Email).Id == 0)
                 {
-                    if (!bcSistema.ValidaUser(usuario.Email))
+                    if (usuario.Senha == usuario.ConfSenha)
                     {
-                        new BcUsuario().Create(usuario);
+                        bcUsuario.save(usuario);
                         return View("Login");
                     }
-
-                    ModelState.AddModelError("", "Usuário já cadastrado!");
+                    else
+                    {
+                        ModelState.AddModelError("ConfSenha", "Senhas divergentes!");
+                    }
                 }
                 else
                 {
-                    ModelState.AddModelError("ConfSenha", "Senhas divergentes!");
+                    ModelState.AddModelError("", "Usuário já cadastrado!");
                 }
             }
-
             return View(usuario);
         }
 
@@ -95,13 +102,7 @@ namespace ProjetoBT2018_1.Controllers
 
         //public string ValidateUser(string email, string senha)
         //{
-        //    if (new BcSistema().ValidaUser(email,senha))
-        //    {
-        //        return "1";
-        //    }
-
-        //    return "0";
+        //    return new BcSistema().ValidaUser(email, senha) ? "1" : "0";
         //}
-        
     }
 }

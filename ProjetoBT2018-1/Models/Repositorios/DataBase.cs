@@ -3,12 +3,13 @@ using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 
-namespace ProjetoBT2018_1.Models
+namespace ProjetoBT2018_1.Models.Repositorios
 {
-    public class DataBase : IDisposable
+    public class DataBase : IDisposable 
     {
         private readonly SqlConnection conn;
 
+        #region Configuração SQL
         // Aqui eu crio um construtor
         // Para que toda vez que a classe for chamada esse método execute
         public DataBase()
@@ -47,5 +48,6 @@ namespace ProjetoBT2018_1.Models
                 conn.Close();
             }
         }
+        #endregion
     }
 }

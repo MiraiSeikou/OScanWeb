@@ -1,39 +1,25 @@
-﻿using ProjetoBT2018_1.Models.Dominio;
-using System.Collections.Generic;
-using System.Data.SqlClient;
+﻿using ProjetoBT2018_1.Models.Contratos;
+using ProjetoBT2018_1.Models.Dominio;
 
 namespace ProjetoBT2018_1.Models
 {
-    public class BcUsuario
+    public class BcUsuario : DbRepositorio<Usuario>
     {
-        DataBase db;
+        private readonly DbRepositorio<Usuario> repositorio;
 
-        // Aqui eu crio uma Business Cliente
-        // Que é responsável po criar um usuario novo
-        public void Create(Usuario usuario)
+        public BcUsuario(DbRepositorio<Usuario> dbRepositorio)
         {
-            string insert = "INSERT INTO DcUsuario (nome, senha, email) VALUES ";
-            insert += string.Format("('{0}',{1},'{2}')", usuario.Nome, usuario.Senha, usuario.Email);
-
-            using (db = new DataBase())
-            {
-                db.exeQuery(insert);
-            }
+            repositorio = dbRepositorio;
         }
 
-        // Aqui eu crio uma Business Cliente 
-        // Que é responsável por atualizar as informações do usuario
-        public bool Update(Usuario usuario)
+        public void save(Usuario usuario)
         {
-            using (db = new DataBase())
-            {
-                string update = "UPDATE DcUsuario SET ";
-                update += string.Format("nome = '{0}', senha = '{1}', email = '{2}' ", usuario.Nome, usuario.Senha, usuario.Email);
-                update += string.Format("WHERE id = {0}", usuario.Id);
+            repositorio.save(usuario);
+        }
 
-                db.exeQuery(update);
-                return true;
-            }
+        public Usuario SelectId(string email)
+        {
+            return repositorio.SelectId(email);
         }
     }
 }

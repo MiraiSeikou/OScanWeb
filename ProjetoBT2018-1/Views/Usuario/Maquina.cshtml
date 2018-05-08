@@ -1,0 +1,421 @@
+﻿@*@model ProjetoBT2018_1.Models.Dominio.Maquina
+@{
+    ViewBag.Title = "Maquina";
+}
+<div class="container-fluid">
+    <div class="row">
+        
+        <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+            <div class="sidebar-sticky">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a id="buttonCpu" class="nav-link active">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-home"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                            Cpu <span class="sr-only">(atual)</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a id="buttonMemoria" class="nav-link">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>
+                            Memoria
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a id="buttonDisco" class="nav-link">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-shopping-cart"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                            Disco
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <main role="main" class="col-md-9" style="width:990px; background-color:green;">
+
+            <div style="width:960px;">
+                <h1 id="tituloGrafico" style="float:left; "></h1>
+                <p id="subTituloGrafico" style="float:right; font-size:20px; margin-top:27px;"></p>
+            </div>
+            <div style="width:960px; clear:both">
+                <p id="informacaoGrafico">% de Utilização</p>
+            </div>
+            <div id="line_top_x"></div>
+            <div id="cpuCore" style="width:950px; height:200px; margin-top:10px;">
+                @for (int i = 0; i < Model.processador.QtdNucleos; i++)
+                 {
+                    <div style="width:200px; height:200px; float:left; margin-right:37.5px;">
+                        <div id="donut_@i" style="width: 100%; height: 100%;"></div>
+                    </div>
+                 }
+            </div>
+            <div id="boxStatus" class="col-md-4">
+                <div id="boxS_1" class="col-md-12">
+                    <div class="col-md-4 box">
+                        <p>Utilização</p>
+                        <p class="h3">100%</p>
+                    </div>
+                    <div class="col-md-8 box">
+                        <p>Velocidade</p>
+                        <p class="h3">2,28 GHz</p>
+                    </div>
+                </div>
+                <div id="boxS_2" class="col-md-12">
+                    <div class="col-md-4">
+                        <p>Processos</p>
+                        <p class="h3">186</p>
+                    </div>
+                    <div class="col-md-4">
+                        <p>Threads</p>
+                        <p class="h3">2499</p>
+                    </div>
+                    <div class="col-md-3">
+                        <p>Identificadores</p>
+                        <p class="h3">85708</p>
+                    </div>
+                </div>
+                <div id="boxS_3" class="col-md-12">
+                    <div class="col-md-6">
+                        <p>Tempo de atividade</p>
+                        <p class="h3">4:17:47:18</p>
+                    </div>
+                </div>
+            </div>
+            <div id="boxLabelsDetalhe" class="col-md-2">
+                <div id="boxD1" class="col-md-13">
+                    <p>Velocidade base:</p>
+                    <p>Sockets:</p>
+                    <p>Núcleos:</p>
+                    <p>Processadores Lógicos:</p>
+                </div>
+            </div>
+            <div id="boxDetalheStatus" class="col-md-2">
+                <div id="boxD2" class="col-md-13">
+                    <p>2,20 GHz</p>
+                    <p>1</p>
+                    <p>4</p>
+                    <p>8</p>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+
+
+
+
+
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript">
+    google.charts.load('current', { 'packages': ['corechart', 'line'] });
+    google.charts.setOnLoadCallback(drawLogScales);
+
+    function drawLogScales() {
+
+        var buttonCpu = document.getElementById('buttonCpu');
+        buttonCpu.onclick = drawCpuChart;
+        var buttonMemoria = document.getElementById('buttonMemoria');
+        buttonMemoria.onclick = drawMemoriaChart;
+        var buttonDisco = document.getElementById('buttonDisco');
+        buttonDisco.onclick = drawDiscoChart;
+        var intervalMem = null;
+        var intervalCpu = null;
+        var intervalDisco = null;
+
+        function drawCpuChart() {
+
+            document.getElementById('cpuCore').style.display = 'block';
+            document.getElementById('tituloGrafico').innerText = 'CPU';
+            document.getElementById('subTituloGrafico').innerText = '@Model.processador.MarcaProcessador  @Model.processador.LinhaProcessador @Model.processador.ModeloProcessador @Model.processador.ClockProcessador';
+            document.getElementById('informacaoGrafico').innerText = '% de Utilização'
+
+
+            if (intervalDisco) {
+                if (intervalMem) {
+                    if (intervalCpu) {
+                        clearInterval(intervalDisco);
+                        clearInterval(intervalMem);
+                        clearInterval(intervalCpu);
+                    } else {
+                        clearInterval(intervalDisco);
+                        clearInterval(intervalMem);
+                    }
+                } else {
+                    clearInterval(intervalDisco);
+                }
+            }
+
+            var arrayValores = [0, 0, 0, 0, 0, 0, 0, 0];
+
+            var dataCpu = new google.visualization.DataTable();
+            dataCpu.addColumn('number', '');
+            dataCpu.addColumn('number', 'CPU');
+
+            var numbersCpu = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+            ];
+
+            for (var i = 0; i < 61; i++) {
+                dataCpu.addRows([[i, numbersCpu[i]]]);
+            }
+
+            var optionsCpu = {
+                chart: {
+                    title: '',
+                    area: ''
+                },
+                width: 950,
+                height: 250,
+                axes: {
+                    x: {
+                        0: { side: 'button' },
+                    },
+                },
+            };
+
+            var chartCpu = new google.charts.Line(document.getElementById('line_top_x'));
+            chartCpu.draw(dataCpu, optionsCpu);
+
+            //intervalCpu = setInterval(function () {
+
+                $.ajax({
+                    url: "/Usuario/Valores",
+                    cache: false,
+                    type: "Post",
+                    success: function (data) {
+                        var valor = JSON.parse(data);
+
+                        for (var i = 0; i < @Model.processador.QtdNucleos; i++) {
+                            arrayValores[i] = valor[i];
+                        }
+
+                        console.log(data)
+                    },
+                    error: function (response) {
+                        alert("error : " + response);
+                    },
+                    async: false
+                }, 'json');
+
+                var arrayData = [
+                    google.visualization.arrayToDataTable([
+                        ['Effort', 'Amount given'],
+                        ['My Avaible', arrayValores[0]],
+                        ['My All', 100 - arrayValores[0]]
+                    ]),
+                    google.visualization.arrayToDataTable([
+                        ['Effort', 'Amount given'],
+                        ['My Avaible', arrayValores[1]],
+                        ['My All', 100 - arrayValores[1]]
+                    ]),
+                    google.visualization.arrayToDataTable([
+                        ['Effort', 'Amount given'],
+                        ['My Avaible', arrayValores[2]],
+                        ['My All', 100 - arrayValores[2]]
+                    ]),
+                    google.visualization.arrayToDataTable([
+                        ['Effort', 'Amount given'],
+                        ['My Avaible', arrayValores[3]],
+                        ['My All', 100 - arrayValores[3]]
+                    ]),
+                    google.visualization.arrayToDataTable([
+                        ['Effort', 'Amount given'],
+                        ['My Avaible', arrayValores[4]],
+                        ['My All', 100 - arrayValores[4]]
+                    ]),
+                    google.visualization.arrayToDataTable([
+                        ['Effort', 'Amount given'],
+                        ['My Avaible', arrayValores[5]],
+                        ['My All', 100 - arrayValores[5]]
+                    ]),
+                    google.visualization.arrayToDataTable([
+                        ['Effort', 'Amount given'],
+                        ['My Avaible', arrayValores[6]],
+                        ['My All', 100 - arrayValores[6]]
+                    ]),
+                    google.visualization.arrayToDataTable([
+                        ['Effort', 'Amount given'],
+                        ['My Avaible', arrayValores[7]],
+                        ['My All', 100 - arrayValores[7]]
+                    ])
+                ];
+
+                var optionsCore = {
+                    pieHole: 0.5,
+                    pieSliceTextStyle: {
+                        color: 'black',
+                    },
+                    legend: 'none'
+                };
+
+                for (var i = 0; i < @Model.processador.QtdNucleos; i++) {
+                    var chart = new google.visualization.PieChart(document.getElementById('donut_' + i));
+                    chart.draw(arrayData[i], optionsCore);
+                }
+
+                for (var i = 60; i > 0; i--) {
+                    numbersCpu[i] = numbersCpu[i - 1];
+                    dataCpu.setValue(i, 1, numbersCpu[i]);
+                }
+
+                var usoCpu = 0;
+
+                for (var i = 0; i < @Model.processador.QtdNucleos; i++) {
+                    usoCpu += arrayValores[i];
+                }
+
+                numbersCpu[0] = usoCpu / @Model.processador.QtdNucleos;
+                dataCpu.setValue(0, 1, numbersCpu[0]);
+                chartCpu.draw(dataCpu, optionsCpu);
+            //}, 1000);
+        }
+
+        function drawMemoriaChart() {
+
+            document.getElementById('cpuCore').style.display = 'none';
+            document.getElementById('tituloGrafico').innerText = 'Memória';
+            document.getElementById('subTituloGrafico').innerText = 'Capacidade / Tipo';
+            document.getElementById('informacaoGrafico').innerText = 'Uso da memória';
+
+            if (intervalDisco) {
+                if (intervalMem) {
+                    if (intervalCpu) {
+                        clearInterval(intervalDisco);
+                        clearInterval(intervalMem);
+                        clearInterval(intervalCpu);
+                    } else {
+                        clearInterval(intervalDisco);
+                        clearInterval(intervalMem);
+                    }
+                } else {
+                    clearInterval(intervalDisco);
+                }
+            }
+
+            var dataMemoria = new google.visualization.DataTable();
+            dataMemoria.addColumn('number', '');
+            dataMemoria.addColumn('number', 'Memoria');
+
+            var numbersMemoria = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 30, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+            ];
+
+            for (var i = 0; i < 61; i++) {
+                dataMemoria.addRows([[i, numbersMemoria[i]]]);
+            }
+
+            var optionsMemoria = {
+                chart: {
+                    title: '',
+                    area: ''
+                },
+                width: 950,
+                height: 250,
+                axes: {
+                    x: {
+                        0: { side: 'button' },
+                    },
+                },
+                colors: ['#AB0D06'],
+            };
+
+            var chartMemoria = new google.charts.Line(document.getElementById('line_top_x'));
+            chartMemoria.draw(dataMemoria, optionsMemoria);
+
+            intervalMem = setInterval(function () {
+
+                for (var i = 60; i > 0; i--) {
+                    numbersMemoria[i] = numbersMemoria[i - 1];
+                    dataMemoria.setValue(i, 1, numbersMemoria[i]);
+                }
+
+                numbersMemoria[0] = 15;
+                dataMemoria.setValue(0, 1, numbersMemoria[0]);
+                chartMemoria.draw(dataMemoria, optionsMemoria);
+
+            }, 1000);
+        }
+
+        function drawDiscoChart() {
+
+            document.getElementById('cpuCore').style.display = 'none';
+            document.getElementById('tituloGrafico').innerText = 'Disco (C:)';
+            document.getElementById('subTituloGrafico').innerText = 'Marca / Modelo';
+            document.getElementById('informacaoGrafico').innerText = 'Tempo de atividade';
+
+            if (intervalDisco) {
+                if (intervalMem) {
+                    if (intervalCpu) {
+                        clearInterval(intervalDisco);
+                        clearInterval(intervalMem);
+                        clearInterval(intervalCpu);
+                    } else {
+                        clearInterval(intervalDisco);
+                        clearInterval(intervalMem);
+                    }
+                } else {
+                    clearInterval(intervalDisco);
+                }
+            }
+
+
+            var data = new google.visualization.DataTable();
+            data.addColumn('number', '');
+            data.addColumn('number', 'Disco');
+
+            var numbers = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+            ];
+
+            for (var i = 0; i < 61; i++) {
+                data.addRows([[i, numbers[i]]]);
+            }
+
+            var options = {
+                chart: {
+                    title: '',
+                    area: ''
+                },
+                width: 950,
+                height: 250,
+                axes: {
+                    x: {
+                        0: { side: 'button' },
+                    },
+                },
+                colors: ['#007329'],
+            };
+
+            var chart = new google.charts.Line(document.getElementById('line_top_x'));
+            chart.draw(data, options);
+
+            //intervalDisco = setInterval(function () {
+
+                for (var i = 60; i > 0; i--) {
+                    numbers[i] = numbers[i - 1];
+                    data.setValue(i, 1, numbers[i]);
+                }
+
+                numbers[0] = 15;
+                data.setValue(0, 1, numbers[0]);
+                chart.draw(data, options);
+
+            //}, 1000);
+        }
+
+        drawCpuChart();
+    }
+
+</script>*@

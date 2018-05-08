@@ -26,6 +26,11 @@ namespace ProjetoBT2018_1
             bundles.Add(new StyleBundle("~/Content/css").Include(
                       "~/Content/bootstrap.css",
                       "~/Content/site.css"));
+
+            bundles.Add(new ScriptBundle("~/bundles/teste_bundle").Include(
+                        "~/Scripts/teste.bundle-{version}.js"));
+
+            BundleTable.EnableOptimizations = true;
         }
     }
 }
