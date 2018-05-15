@@ -9,37 +9,20 @@ namespace ProjetoBT2018_1.Models.Repositorios
     {
         HttpClient client;
 
-        public List<Maquina> GetAllForIdAsync(int idUsuario)
+        public ApiRepositorio()
         {
-            using (var client = new HttpClient())
-            {
-                List<Maquina> maquinas = new List<Maquina>();
-
-                client.BaseAddress = new System.Uri("http://oscanwebapi.azurewebsites.net");
-                client.DefaultRequestHeaders.Accept.Clear();
-                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-                var response = client.GetAsync(string.Format("api/Maquinas/{0}",1)).Result;
-                if (response.IsSuccessStatusCode)
-                {
-                    maquinas = response.Content.ReadAsAsync<List<Maquina>>().Result;
-                }
-
-                return maquinas;
-            }
+            client = new HttpClient();
+            client.BaseAddress = new System.Uri("http://oscanwebapi.azurewebsites.net");
+            client.DefaultRequestHeaders.Accept.Clear();
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
 
-        //public async Task<Processador> GetProcessador(int idMaquina)
-        //{
-        //    Processador processador = new Processador();
-
-        //    client.BaseAddress = new System.Uri("http://");
-        //    client.DefaultRequestHeaders.Accept.Clear();
-        //    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-        //    var response = await client.GetAsync("api/produtos/");
-
-        //    if (response.IsSuccessStatusCode)
-        //}
+        public HttpResponseMessage Get(string endPoint)
+        {
+            using (client)
+            {
+                return client.GetAsync(endPoint).Result;
+            }
+        }
     }
 }

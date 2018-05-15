@@ -9,7 +9,7 @@ namespace ProjetoBT2018_1.Controllers
 {
     public class HomeController : Controller
     {
-        private BcUsuario bcUsuario = BcUsuarioADO.BcUsuarioConstrutor(); 
+        private BcUsuario bcUsuario = UsuarioADO.BcUsuarioConstrutor(); 
         HttpCookie cookie;
 
         // Aqui eu criei uma action que redireciona o usuario para tela de login.

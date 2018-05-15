@@ -12,7 +12,7 @@ namespace ProjetoBT2018_1.Controllers
 {
     public class UsuarioController : Controller
     {
-        private BcUsuario bcUsuario = BcUsuarioADO.BcUsuarioConstrutor();
+        private BcUsuario bcUsuario = UsuarioADO.BcUsuarioConstrutor();
         private HttpCookie cookie;
 
         // GET: Usuario
@@ -22,35 +22,26 @@ namespace ProjetoBT2018_1.Controllers
             if (cookie != null)
             {
                 Usuario usuario = bcUsuario.SelectId(cookie.Values["User"]);
-
-                var maquinas = new ApiRepositorio().GetAllForIdAsync(usuario.Id);
-                return View(maquinas);
+                return View(new MaquinaContexto().GetAllMachines(usuario.Id));
             }
 
             return RedirectToAction("Login", "Home");
         }
 
-        //public ActionResult Maquina(int idMaquina)
+        public ActionResult Maquina(int idMaquina)
+        {
+            cookie = Request.Cookies["Login"];
+            cookie.Values.Set("Maquina", idMaquina.ToString());
+            Response.Cookies.Set(cookie);
+
+            return View(new MaquinaContexto().GetMachineContext(idMaquina));
+        }
+
+        //public double Processador()
         //{
-        //    //cookie = Request.Cookies["Login"];
-        //    //cookie.Values.Set("Maquina", idMaquina.ToString());
-        //    //Response.Cookies.Set(cookie);
-        //    ////return View(new Maquina().allMaquinas().FirstOrDefault(item => item.Id == idMaquina));
-        //}
-
-        //public string Valores()
-        //{
-        //    //cookie = Request.Cookies["Login"];
-        //    //List<int> retorno = new List<int>();
-        //    ////Maquina maquina = new Maquina().allMaquinas().FirstOrDefault(item => item.Id == int.Parse(cookie.Values["Maquina"]));
-        //    //Random rnd = new Random();
-
-        //    //for (int i = 0; i < maquina.processador.QtdNucleos; i++)
-        //    //{
-        //    //    retorno.Add(rnd.Next(0, 101));
-        //    //}
-
-        //    //return JsonConvert.SerializeObject(retorno);
+        //    cookie = Request.Cookies["Login"];
+        //    Processador processador = new MaquinaContexto().GetProcessador(int.Parse(cookie.Values["Maquina"]));
+        //    return (double.Parse(string.Format("{0:0.00}", processador.Usage).Replace(',','.')));
         //}
     }
 }

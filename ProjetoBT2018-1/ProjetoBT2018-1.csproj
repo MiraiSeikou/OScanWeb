@@ -157,11 +157,13 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\BcUsuario.cs" />
+    <Compile Include="Models\Dominio\FileStore.cs" />
     <Compile Include="Models\Dominio\Maquina.cs" />
-    <Compile Include="Models\Dominio\MaquinaContexto.cs" />
+    <Compile Include="Models\Dominio\Memoria.cs" />
+    <Compile Include="Models\MaquinaContexto.cs" />
     <Compile Include="Models\Dominio\Processador.cs" />
     <Compile Include="Models\Repositorios\ApiRepositorio.cs" />
-    <Compile Include="Models\Repositorios\BcUsuarioADO.cs" />
+    <Compile Include="Models\Repositorios\UsuarioADO.cs" />
     <Compile Include="Models\Contratos\DbRepositorio.cs" />
     <Compile Include="Models\Repositorios\DataBase.cs" />
     <Compile Include="Models\Dominio\Usuario.cs" />

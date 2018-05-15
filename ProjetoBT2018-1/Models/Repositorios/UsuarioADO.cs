@@ -3,7 +3,7 @@ using ProjetoBT2018_1.Models.Dominio;
 
 namespace ProjetoBT2018_1.Models.Repositorios
 {
-    public class BcUsuarioADO : DbRepositorio<Usuario>
+    public class UsuarioADO : DbRepositorio<Usuario>
     {
         #region 1º versão
         // Aqui eu crio uma funcionalidade que faz uma validação de nv1 se o usuario existe na Base de Dados.
@@ -59,7 +59,7 @@ namespace ProjetoBT2018_1.Models.Repositorios
 
         public static BcUsuario BcUsuarioConstrutor()
         {
-            return new BcUsuario(new BcUsuarioADO());
+            return new BcUsuario(new UsuarioADO());
         }
 
         public void Create(Usuario usuario)
