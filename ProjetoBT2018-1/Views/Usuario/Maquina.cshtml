@@ -1,4 +1,4 @@
-﻿@model ProjetoBT2018_1.Models.MaquinaContexto
+﻿    @model ProjetoBT2018_1.Models.Dominios.Maquina
 @{
     ViewBag.Title = "Maquina";
 }
@@ -30,7 +30,7 @@
             </div>
         </nav>
 
-        <main role="main" class="col-md-9" style="width:990px; background-color:green;">
+        <main role="main" class="col-md-9" style="width:990px;">
 
             <div style="width:960px;">
                 <h1 id="tituloGrafico" style="float:left;"> </h1>
@@ -107,40 +107,51 @@
 
         var buttonDisco = document.getElementById('buttonDisco');
         buttonDisco.onclick = chartDisco;
-        //var intervalMem = null;
-        var intervalCpu = null;
-        //var intervalDisco = null;
+
+
+        var intervalMem;
+        var intervalCpu;
+        var intervalDisco;
 
         function chartCpu() {
 
+            clearInterval(intervalDisco);
+            clearInterval(intervalMem);
+            clearInterval(intervalCpu);
+
+            document.getElementById('boxLabelsDetalhe').style.display = 'none';
+            document.getElementById('boxDetalheStatus').style.display = 'none';
+            document.getElementById('tituloGrafico').innerText = "CPU";
+
+
             document.getElementById('displayStatus_1.1').innerText = 'Utilização';
+            document.getElementById('displayStatus_1.1Value').innerText = '0 %';
+
+            document.getElementById('displayStatus_1.2').innerText = '';
+            
+
             var utilizacao = document.getElementById('displayStatus_1.1Value');
 
-            document.getElementById('displayStatus_3.1').innerText = 'Momento';
-            var momento = document.getElementById('displayStatus_3.1Value');
+            var dataCpu = new google.visualization.DataTable();
+            dataCpu.addColumn('number', '');
+            dataCpu.addColumn('number', 'Cpu');
 
-            var data = new google.visualization.DataTable();
-            data.addColumn('number', '');
-            data.addColumn('number', 'Cpu');
-
-            var array = [
+            var arrayCpu = [
                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0
             ];
 
-            for (var i = 0; i < 61; i++) {
-                data.addRows([
-                    [i, array[i]]
-                ]);
+            for (var i = 0; i < 60; i++) {
+                dataCpu.addRows([[i, arrayCpu[i]]]);
             }
 
-            var options = {
+            var optionsCpu = {
                 chart: {
-                    title: '',
+                    title: '% de Utilização',
                     area: ''
                 },
                 width: 950,
@@ -152,39 +163,49 @@
                 }
             };
 
-            var chart = new google.charts.Line(document.getElementById('line_top_x'));
-            chart.draw(data, google.charts.Line.convertOptions(options));
+            var chartCpu = new google.charts.Line(document.getElementById('line_top_x'));
+            chartCpu.draw(dataCpu, optionsCpu);
 
             intervalCpu = setInterval(function () {
 
-                for (var i = 60; i > 0; i--) {
-                    array[i] = array[i - 1];
-                    data.setValue(i, 1, array[i]);
-                }
-                var teste;
-
                 $.ajax({
-                    url: "https://oscanwebapi.azurewebsites.net/api/Processadors/Id/{IdMaquina}",
-                    data: { IdMaquina : @Model.Maquina.Id },
-                    success: function (data) {
+                    url: '/Maquina/GetProcessor',
+                    data: { idMaquina: @Model.Dominio.Id },
+                     success: function (data) {
 
-                        var response = JSON.parse(data);
-
+                         arrayCpu[0] = data;
                     },
-                    //error: function (response) {
-                    //    alert("error : " + response);
-                    //},
-                    async: false
-                }, 'json');
+                }); 
 
-                data.setValue(0, 1, array[0]);
-                chart.draw(data, options);
+                for (var i = 59; i > 0; i--) {
+                    arrayCpu[i] = arrayCpu[i - 1];
+                    dataCpu.setValue(i, 1, arrayCpu[i]);
+                }
 
-                document.getElementById('informacaoGrafico').innerText = teste;        
-            });
+                dataCpu.setValue(0, 1, arrayCpu[0]); 
+                chartCpu.draw(dataCpu, optionsCpu);
+                utilizacao.innerText = arrayCpu[0] + ' %';
+
+            }, 1000);
         }
 
         function chartMemoria() {
+
+            clearInterval(intervalDisco);
+            clearInterval(intervalMem);
+            clearInterval(intervalCpu);
+
+            document.getElementById('boxLabelsDetalhe').style.display = 'none';
+            document.getElementById('boxDetalheStatus').style.display = 'none';
+            document.getElementById('tituloGrafico').innerText = "Memória";
+            document.getElementById('displayStatus_1.1').innerText = 'Em Uso';
+            document.getElementById('displayStatus_1.2').innerText = 'Disponível';
+            document.getElementById('displayStatus_1.1Value').innerText = '0 %';
+
+            var utilizacao = document.getElementById('displayStatus_1.1Value');
+            var disponivel = document.getElementById('displayStatus_1.2Value');
+            
+
             var data = new google.visualization.DataTable();
             data.addColumn('number', '');
             data.addColumn('number', 'Memoria');
@@ -206,7 +227,7 @@
 
             var options = {
                 chart: {
-                    title: '',
+                    title: 'Uso da memória',
                     area: ''
                 },
                 width: 950,
@@ -220,9 +241,37 @@
 
             var chart = new google.charts.Line(document.getElementById('line_top_x'));
             chart.draw(data, google.charts.Line.convertOptions(options));
+
+            intervalMem = setInterval(function () {
+
+                $.ajax({
+                    url: '/Maquina/GetMemorias',
+                    data: { idMaquina: @Model.Dominio.Id },
+                     success: function (data) {
+
+                         arrayCpu[0] = data;
+
+                    },
+                }); 
+
+                for (var i = 59; i > 0; i--) {
+                    array[i] = array[i - 1];
+                    data.setValue(i, 1, array[i]);
+                }
+
+                data.setValue(0, 1, array[0]); 
+                chart.draw(data, options);
+                utilizacao.innerText = array[0] + ' %';
+
+            }, 1000);
         }
 
         function chartDisco() {
+
+            clearInterval(intervalDisco);
+            clearInterval(intervalMem);
+            clearInterval(intervalCpu);
+
             var data = new google.visualization.DataTable();
             data.addColumn('number', '');
             data.addColumn('number', 'Disco');
@@ -258,30 +307,30 @@
 
             var chart = new google.charts.Line(document.getElementById('line_top_x'));
             chart.draw(data, google.charts.Line.convertOptions(options));
+
+            intervalDisco = setInterval(function () {
+
+                $.ajax({
+                    url: '/Maquina/GetProcessor',
+                    data: { idMaquina: @Model.Dominio.Id },
+                     success: function (data) {
+
+                         array[0] = data;
+                    },
+                }); 
+
+                for (var i = 59; i > 0; i--) {
+                    array[i] = array[i - 1];
+                    data.setValue(i, 1, array[i]);
+                }
+
+                data.setValue(0, 1, array[0]); 
+                chart.draw(data, options);
+                utilizacao.innerText = array[0] + ' %';
+
+            }, 1000);
         }
 
         chartCpu();
     }
 </script>
-
-    @*//document.getElementById('cpuCore').style.display = 'none';
-    document.getElementById('tituloGrafico').innerText = 'CPU';
-    document.getElementById('subTituloGrafico').innerText = @Model.Maquina.Nome;
-    document.getElementById('informacaoGrafico').innerText = '% de Utilização'
-
-
-    //if (intervalDisco) {
-    //    if (intervalMem) {
-    //        if (intervalCpu) {
-    //            clearInterval(intervalDisco);
-    //            clearInterval(intervalMem);
-    //            clearInterval(intervalCpu);
-    //        } else {
-    //            clearInterval(intervalDisco);
-    //            clearInterval(intervalMem);
-    //        }
-    //    } else {
-    //        clearInterval(intervalDisco);
-    //    }
-    //}*@
-

@@ -56,6 +56,9 @@
       <HintPath>..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.8\lib\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -122,9 +125,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.ApplicationInsights">
       <HintPath>..\packages\Microsoft.ApplicationInsights.2.2.0\lib\net45\Microsoft.ApplicationInsights.dll</HintPath>
     </Reference>
@@ -152,21 +152,24 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\MaquinaController.cs" />
     <Compile Include="Controllers\UsuarioController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\BcUsuario.cs" />
-    <Compile Include="Models\Dominio\FileStore.cs" />
-    <Compile Include="Models\Dominio\Maquina.cs" />
-    <Compile Include="Models\Dominio\Memoria.cs" />
-    <Compile Include="Models\MaquinaContexto.cs" />
-    <Compile Include="Models\Dominio\Processador.cs" />
+    <Compile Include="Models\Dominios\Relatorio.cs" />
+    <Compile Include="Models\Dominios\DominioMaquina.cs" />
+    <Compile Include="Models\Dominios\FileStore.cs" />
+    <Compile Include="Models\Dominios\Maquina.cs" />
+    <Compile Include="Models\Dominios\Memoria.cs" />
+    <Compile Include="Models\BcMaquina.cs" />
+    <Compile Include="Models\Dominios\Processador.cs" />
     <Compile Include="Models\Repositorios\ApiRepositorio.cs" />
     <Compile Include="Models\Repositorios\UsuarioADO.cs" />
     <Compile Include="Models\Contratos\DbRepositorio.cs" />
     <Compile Include="Models\Repositorios\DataBase.cs" />
-    <Compile Include="Models\Dominio\Usuario.cs" />
+    <Compile Include="Models\Dominios\Usuario.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -210,6 +213,7 @@
     <Content Include="Views\Home\Cadastrar.cshtml" />
     <Content Include="Scripts\teste.bundle-1.0.0.js" />
     <Content Include="Views\Usuario\Maquina.cshtml" />
+    <Content Include="Views\Maquina\Relatorio.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

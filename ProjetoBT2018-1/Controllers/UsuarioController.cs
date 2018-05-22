@@ -22,7 +22,7 @@ namespace ProjetoBT2018_1.Controllers
             if (cookie != null)
             {
                 Usuario usuario = bcUsuario.SelectId(cookie.Values["User"]);
-                return View(new MaquinaContexto().GetAllMachines(usuario.Id));
+                return View(new BcMaquina().GetAllMachines(usuario.Id));
             }
 
             return RedirectToAction("Login", "Home");
@@ -34,14 +34,7 @@ namespace ProjetoBT2018_1.Controllers
             cookie.Values.Set("Maquina", idMaquina.ToString());
             Response.Cookies.Set(cookie);
 
-            return View(new MaquinaContexto().GetMachineContext(idMaquina));
+            return View(new BcMaquina().GetMachine(idMaquina));
         }
-
-        //public double Processador()
-        //{
-        //    cookie = Request.Cookies["Login"];
-        //    Processador processador = new MaquinaContexto().GetProcessador(int.Parse(cookie.Values["Maquina"]));
-        //    return (double.Parse(string.Format("{0:0.00}", processador.Usage).Replace(',','.')));
-        //}
     }
 }
