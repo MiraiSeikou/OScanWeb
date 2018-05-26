@@ -99,15 +99,17 @@
 
     function drawChart() {
 
+        var chartCpu;
         var buttonCpu = document.getElementById('buttonCpu');
         buttonCpu.onclick = chartCpu;
 
+        var chartMemoria;
         var buttonMemoria = document.getElementById('buttonMemoria');
         buttonMemoria.onclick = chartMemoria;
 
+        var chartDisco;
         var buttonDisco = document.getElementById('buttonDisco');
         buttonDisco.onclick = chartDisco;
-
 
         var intervalMem;
         var intervalCpu;
@@ -121,13 +123,14 @@
 
             document.getElementById('boxLabelsDetalhe').style.display = 'none';
             document.getElementById('boxDetalheStatus').style.display = 'none';
+
             document.getElementById('tituloGrafico').innerText = "CPU";
-
-
+            document.getElementById('subTituloGrafico').innerText = '@Model.Processador.Name';
             document.getElementById('displayStatus_1.1').innerText = 'Utilização';
             document.getElementById('displayStatus_1.1Value').innerText = '0 %';
 
             document.getElementById('displayStatus_1.2').innerText = '';
+            document.getElementById('displayStatus_1.2Value').innerText = '';
             
 
             var utilizacao = document.getElementById('displayStatus_1.1Value');
@@ -197,10 +200,13 @@
 
             document.getElementById('boxLabelsDetalhe').style.display = 'none';
             document.getElementById('boxDetalheStatus').style.display = 'none';
-            document.getElementById('tituloGrafico').innerText = "Memória";
+
+            document.getElementById('tituloGrafico').innerText = 'Memória';
+            document.getElementById('subTituloGrafico').innerText = '';
             document.getElementById('displayStatus_1.1').innerText = 'Em Uso';
             document.getElementById('displayStatus_1.2').innerText = 'Disponível';
             document.getElementById('displayStatus_1.1Value').innerText = '0 %';
+            document.getElementById('displayStatus_1.2Value').innerText = '0';
 
             var utilizacao = document.getElementById('displayStatus_1.1Value');
             var disponivel = document.getElementById('displayStatus_1.2Value');
@@ -243,15 +249,21 @@
             chart.draw(data, google.charts.Line.convertOptions(options));
 
             intervalMem = setInterval(function () {
+                var disponivelRam;
+                var suffix;
 
                 $.ajax({
                     url: '/Maquina/GetMemorias',
                     data: { idMaquina: @Model.Dominio.Id },
-                     success: function (data) {
+                    success: function (data) {
 
-                         arrayCpu[0] = data;
+                        var response = JSON.parse(data);
+                        array[0] = response.UsoRamPorcentagem;
+                        disponivelRam = response.RamDisponivel;
+                        suffix = response.SuffixRamDisponivel;
 
                     },
+                    async:false
                 }); 
 
                 for (var i = 59; i > 0; i--) {
@@ -262,6 +274,8 @@
                 data.setValue(0, 1, array[0]); 
                 chart.draw(data, options);
                 utilizacao.innerText = array[0] + ' %';
+                disponivel.innerText = disponivelRam + ' ' + suffix;
+                
 
             }, 1000);
         }

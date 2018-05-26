@@ -1,25 +1,37 @@
-﻿using ProjetoBT2018_1.Models.Contratos;
-using ProjetoBT2018_1.Models.Dominio;
+﻿using ProjetoBT2018_1.Models.Dominio;
+using ProjetoBT2018_1.Models.Repositorios;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace ProjetoBT2018_1.Models
 {
-    public class BcUsuario : DbRepositorio<Usuario>
+    public class BcUsuario 
     {
-        private readonly DbRepositorio<Usuario> repositorio;
-
-        public BcUsuario(DbRepositorio<Usuario> dbRepositorio)
+        public Usuario Autenticar(string email, string senha)
         {
-            repositorio = dbRepositorio;
+            var response = new ApiRepositorio().Get(string.Format("api/Usuarios/{0}/{1}", email, senha));
+            if (response.IsSuccessStatusCode)
+            {
+                return response.Content.ReadAsAsync<Usuario>().Result;
+            }
+
+            return new Usuario();
         }
 
-        public void save(Usuario usuario)
+        public Usuario SelectUsuario(string email)
         {
-            repositorio.save(usuario);
+            var response = new ApiRepositorio().Get(string.Format("api/Usuarios/{0}", email));
+            if (response.IsSuccessStatusCode)
+            {
+                return response.Content.ReadAsAsync<Usuario>().Result;
+            }
+
+            return new Usuario();
         }
 
-        public Usuario SelectId(string email)
+        public async Task Cadastrar(Usuario usuario)
         {
-            return repositorio.SelectId(email);
+            await new ApiRepositorio().Post("api/Usuarios", usuario);
         }
     }
 }

@@ -12,29 +12,17 @@ namespace ProjetoBT2018_1.Controllers
 {
     public class UsuarioController : Controller
     {
-        private BcUsuario bcUsuario = UsuarioADO.BcUsuarioConstrutor();
         private HttpCookie cookie;
 
-        // GET: Usuario
         public ActionResult Index()
         {
             cookie = Request.Cookies["Login"];
             if (cookie != null)
             {
-                Usuario usuario = bcUsuario.SelectId(cookie.Values["User"]);
-                return View(new BcMaquina().GetAllMachines(usuario.Id));
+                return View(new MaquinaController().GetAllMachines(int.Parse(cookie.Values["User"])));
             }
 
             return RedirectToAction("Login", "Home");
-        }
-
-        public ActionResult Maquina(int idMaquina)
-        {
-            cookie = Request.Cookies["Login"];
-            cookie.Values.Set("Maquina", idMaquina.ToString());
-            Response.Cookies.Set(cookie);
-
-            return View(new BcMaquina().GetMachine(idMaquina));
         }
     }
 }
